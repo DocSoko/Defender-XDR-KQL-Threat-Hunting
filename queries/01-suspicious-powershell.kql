@@ -1,1 +1,21 @@
+// Hunt: Suspicious PowerShell Activity
+// Data Source: Microsoft Defender for Endpoint
+// MITRE ATT&CK: T1059.001 - PowerShell
 
+DeviceProcessEvents
+| where FileName =~ "powershell.exe"
+| where ProcessCommandLine contains_any (
+    "-enc",
+    "-encodedcommand",
+    "FromBase64String",
+    "IEX",
+    "Invoke-Expression"
+)
+| project
+    Timestamp,
+    DeviceName,
+    AccountName,
+    ProcessCommandLine,
+    InitiatingProcessFileName,
+    InitiatingProcessCommandLine
+| order by Timestamp desc
